@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mr Jones Fitness</title>
+<style>
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f4f6f8;color:#111827}
+.container{max-width:1000px;margin:auto;padding:14px}
+header,.panel{background:white;border-radius:20px;padding:18px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+h1{margin:0;font-size:30px}h2{margin:0 0 8px;font-size:22px}p{color:#6b7280;line-height:1.45}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.tab{border:0;border-radius:16px;background:white;padding:14px;font-weight:bold;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.tab.active{background:#111827;color:white}
+.search{width:100%;padding:14px;border:1px solid #ddd;border-radius:14px;font-size:17px;margin-bottom:8px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.card{background:white;border-radius:18px;padding:14px;border:1px solid #e5e7eb;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.card.done{background:#ecfdf5;border-color:#10b981}
+.top{display:flex;justify-content:space-between;gap:10px}.name{font-size:18px;font-weight:bold}
+.day{font-size:13px;color:#6b7280;margin-top:4px;font-weight:bold}
+.tick{width:34px;height:34px;border-radius:50%;border:1px solid #ccc;background:#f9fafb;font-size:20px}
+.badge{display:inline-block;background:#eef2f7;border-radius:999px;padding:5px 9px;margin:8px 5px 8px 0;font-size:13px;font-weight:bold;color:#374151}
+.muscle{background:#f8fafc;border-radius:12px;padding:10px;margin-top:8px;color:#374151}.muscle strong{color:#111827}
+.note{font-size:14px;margin:0;color:#6b7280}
+@media(max-width:700px){.tabs,.grid{grid-template-columns:1fr}h1{font-size:26px}}
+</style>
+</head>
+<body>
+<div class="container">
+<header><h1>Mr Jones Fitness</h1><p>Push/pull gym routine and muscle-learning guide.</p></header>
+<div class="tabs">
+<button class="tab active" onclick="showRoutine('pushChest', this)">Push 1<br>Chest</button>
+<button class="tab" onclick="showRoutine('pullBiceps', this)">Pull 1<br>Biceps</button>
+<button class="tab" onclick="showRoutine('pushShoulders', this)">Push 2<br>Shoulders</button>
+<button class="tab" onclick="showRoutine('pullBack', this)">Pull 2<br>Back</button>
+</div>
+<section class="panel">
+<h2 id="routineTitle">Push 1: Chest Focus</h2>
+<p id="routineSubtitle">Chest, front shoulders and triceps</p>
+<input class="search" id="searchBox" oninput="renderExercises()" placeholder="Search all routines, e.g. chest, curl, triceps, lats">
+<p class="note">Search now checks all routines. Clear the search box to return to the selected day.</p>
+</section>
+<div class="grid" id="exerciseGrid"></div>
+<section class="panel"><h2>Suggested Rotation</h2><p><strong>Day 1:</strong> Push 1 - Chest</p><p><strong>Day 2:</strong> Pull 1 - Biceps</p><p><strong>Day 3:</strong> Push 2 - Shoulders</p><p><strong>Day 4:</strong> Pull 2 - Back</p></section>
+</div>
+<script>
+const routines={
+pushChest:{label:"Push 1: Chest",title:"Push 1: Chest Focus",subtitle:"Chest, front shoulders and triceps",exercises:[
+["Barbell Bench Press","Compound","Chest, front shoulders, triceps","Pectoralis Major, Anterior Deltoid, Triceps Brachii"],
+["Dumbbell Chest Press","Compound","Chest, front shoulders, triceps","Pectoralis Major, Anterior Deltoid, Triceps Brachii"],
+["Seated Chest Press Machine","Compound","Chest, front shoulders, triceps","Pectoralis Major, Anterior Deltoid, Triceps Brachii"],
+["Incline Chest Press","Compound","Upper chest, front shoulders, triceps","Clavicular Head of Pectoralis Major, Anterior Deltoid, Triceps Brachii"],
+["Dumbbell Chest Fly","Isolation","Chest","Pectoralis Major"],["Cable Crossover","Isolation","Chest","Pectoralis Major"],["Cable Tricep Pushdown","Isolation","Triceps","Triceps Brachii"],["Lying Triceps Extension / Skull Crusher","Isolation","Triceps","Triceps Brachii, especially Long Head"]]},
+pullBiceps:{label:"Pull 1: Biceps",title:"Pull 1: Biceps Focus",subtitle:"Biceps, brachialis and forearms",exercises:[
+["Incline Dumbbell Curl","Isolation","Biceps, especially outer/long head","Biceps Brachii Long Head"],["Seated Hammer Curl","Isolation","Arm thickness, forearms","Brachialis, Brachioradialis, Biceps Brachii"],["Concentration Curl","Isolation","Biceps","Biceps Brachii"],["Preacher Curl","Isolation","Biceps, especially inner/short head","Biceps Brachii Short Head"],["Cable Straight Bar Curl","Isolation","Biceps","Biceps Brachii"],["Wrist Curl","Isolation","Forearms","Wrist Flexors"],["Reverse Wrist Curl","Isolation","Forearms","Wrist Extensors"],["Reverse Curl","Isolation","Forearms and arm thickness","Brachioradialis, Brachialis"]]},
+pushShoulders:{label:"Push 2: Shoulders",title:"Push 2: Shoulder Focus",subtitle:"Shoulders, rear delts and triceps",exercises:[
+["Seated Shoulder Press","Compound","Front shoulders, side shoulders, triceps","Anterior Deltoid, Lateral Deltoid, Triceps Brachii"],["Lateral Raise","Isolation","Side shoulders","Lateral Deltoid"],["Front Raise","Isolation","Front shoulders","Anterior Deltoid"],["Rear Delt Fly","Isolation","Rear shoulders, upper back","Posterior Deltoid, Rhomboids, Trapezius"],["Face Pull","Isolation","Rear shoulders, upper back, rotator cuff","Posterior Deltoid, Rhomboids, Trapezius, Rotator Cuff"],["Dumbbell Tricep Kickback","Isolation","Triceps","Triceps Brachii"],["Overhead Triceps Extension","Isolation","Triceps, especially long head","Triceps Brachii Long Head"],["Cable Tricep Pushdown","Isolation","Triceps","Triceps Brachii"]]},
+pullBack:{label:"Pull 2: Back",title:"Pull 2: Back Focus",subtitle:"Back, lats, traps and rear delts",exercises:[
+["Wide-Grip Pull-Up","Compound","Upper back, lats, biceps","Latissimus Dorsi, Biceps Brachii"],["Neutral-Grip Pull-Up","Compound","Lats, biceps, forearms","Latissimus Dorsi, Biceps Brachii, Brachialis, Brachioradialis"],["Chin-Up","Compound","Biceps and lats","Biceps Brachii, Latissimus Dorsi"],["Lat Pulldown","Compound","Lats and biceps","Latissimus Dorsi, Biceps Brachii"],["Straight Arm Lat Pulldown","Isolation","Lats","Latissimus Dorsi"],["Seated Row Machine","Compound","Mid-back, lats, biceps","Rhomboids, Latissimus Dorsi, Biceps Brachii"],["T-Bar Row","Compound","Mid-back, lats, traps, biceps","Rhomboids, Latissimus Dorsi, Trapezius, Biceps Brachii"],["Bent Over Row","Compound","Mid-back, lats, traps, biceps, lower back","Rhomboids, Latissimus Dorsi, Trapezius, Biceps Brachii, Erector Spinae"],["Dumbbell Shrug","Isolation","Upper traps","Upper Trapezius"],["Single-Arm Dumbbell Row","Compound","Lats, mid-back, biceps","Latissimus Dorsi, Rhomboids, Trapezius, Biceps Brachii"]]}
+};
+let currentRoutine="pushChest";let completed=JSON.parse(localStorage.getItem("completedExercises")||"{}");
+function showRoutine(key,button){currentRoutine=key;document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));button.classList.add("active");document.getElementById("routineTitle").textContent=routines[key].title;document.getElementById("routineSubtitle").textContent=routines[key].subtitle;document.getElementById("searchBox").value="";renderExercises();}
+function getExercises(){const search=document.getElementById("searchBox").value.toLowerCase().trim();let list=[];if(search){Object.keys(routines).forEach(key=>{routines[key].exercises.forEach(ex=>list.push({key:key,day:routines[key].label,ex:ex}));});}else{routines[currentRoutine].exercises.forEach(ex=>list.push({key:currentRoutine,day:routines[currentRoutine].label,ex:ex}));}return list.filter(item=>{if(!search)return true;return (item.day+" "+item.ex.join(" ")).toLowerCase().includes(search);});}
+function renderExercises(){const grid=document.getElementById("exerciseGrid");grid.innerHTML="";const items=getExercises();items.forEach(item=>{const ex=item.ex;const id=item.key+"-"+ex[0];const card=document.createElement("div");card.className="card"+(completed[id]?" done":"");card.innerHTML='<div class="top"><div><div class="name">'+ex[0]+'</div><div class="day">'+item.day+'</div></div><button class="tick">'+(completed[id]?"✓":"")+'</button></div><span class="badge">'+ex[1]+'</span><span class="badge">'+ex[2]+'</span><div class="muscle"><strong>Correct muscle names:</strong><br>'+ex[3]+'</div>';card.querySelector(".tick").onclick=function(){completed[id]=!completed[id];localStorage.setItem("completedExercises",JSON.stringify(completed));renderExercises();};grid.appendChild(card);});if(items.length===0){grid.innerHTML='<div class="card"><div class="name">No matches found</div><p>Try another search term, such as biceps, curl, chest, triceps, lats, row or shoulder.</p></div>';}}
+renderExercises();
+</script>
+</body>
+</html>
